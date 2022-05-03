@@ -42,6 +42,8 @@ namespace AnimeListMVC
                 PositionClass = ToastPositions.TopRight
             });
 
+
+
             services.AddControllersWithViews();
         }
 
