@@ -3,11 +3,27 @@
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
 
+    <link rel="stylesheet" href="~/css/site.css" />
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+        @if(UserManager.GetUserAsync(User).Result.ProfilePicture != null)
+        {
+            <li class="nav-item">
+                <img class="avatarPP rounded-circle" alt="Profile-Avatar"
+                    src="data:image/*;base64, 
+                        @(Convert.ToBase64String(UserManager.GetUserAsync(User).Result.ProfilePicture))"/>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <img class="avatarPP rounded-circle" alt="Profile-Avatar"
+                    src="~/images/user-2.png"/>
+            </li>
+        }
+        <li class="nav-item">
+        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@User.Identity.Name</a>
     </li>
     <li class="nav-item">
         <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">

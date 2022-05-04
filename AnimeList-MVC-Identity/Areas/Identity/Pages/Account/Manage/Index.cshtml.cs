@@ -1,25 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AnimeList_MVC_Identity.Models.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using AnimeList_MVC_Identity.Consts;
 
 namespace AnimeList_MVC_Identity.Areas.Identity.Pages.Account.Manage
 {
     public partial class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
+
+        //private myConsts _myConsts = new myConsts();
 
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<AppUser> userManager,
+            SignInManager<AppUser> signInManager
+            )
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            // _myConsts = myConsts;
         }
 
         public string Username { get; set; }
@@ -32,21 +39,42 @@ namespace AnimeList_MVC_Identity.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
+
+            [Required, Display(Name = "First Name")]
+            public string FirstName { get; set; }
+
+            
+            [Required, Display(Name = "Last Name")]
+            public string LastName { get; set; }
+
+
+            [Required, Display(Name = "Username")]
+            public string Username { get; set; }
+
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Display(Name ="Profile Picture")]
+            public byte[] ProfilePicture  { get; set; }
+
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(AppUser user)
         {
-            var userName = await _userManager.GetUserNameAsync(user);
+            //var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
-            Username = userName;
+            //Username = userName;
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                Username = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = phoneNumber,
+                ProfilePicture = user.ProfilePicture
             };
         }
 
@@ -77,6 +105,28 @@ namespace AnimeList_MVC_Identity.Areas.Identity.Pages.Account.Manage
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+
+            //var username = await _userManager.GetUserNameAsync(user);
+            var username = user.UserName;
+            var firstname = user.FirstName;
+            var lastname = user.LastName;
+
+            if (Input.Username != username)
+            {
+                user.UserName = Input.Username;
+                await _userManager.UpdateAsync(user);
+            }
+            if (Input.FirstName != firstname)
+            {
+                user.FirstName = Input.FirstName;
+                await _userManager.UpdateAsync(user);
+            }
+            if (Input.LastName != lastname)
+            {
+                user.LastName = Input.LastName;
+                await _userManager.UpdateAsync(user);
+            }
+
             if (Input.PhoneNumber != phoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
@@ -85,6 +135,35 @@ namespace AnimeList_MVC_Identity.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            // Profile Picture
+            if (Request.Form.Files.Count > 0)
+            {
+                var file = Request.Form.Files.FirstOrDefault();
+
+                //// check if image is jpg / png
+                //if (! _myConsts.allowedExtensions.Contains(Path.GetExtension(file.FileName).ToLower()))
+                //{
+                //    ModelState.AddModelError("ProfilePicture", "Only .JPG , .PNG images are allowed.");
+
+                //}
+
+                //// check the size of the image : OneMegaByte = 1 MB = 1048576 B
+                //if (file.Length > _myConsts.OneMegaByte)
+                //{
+                //    ModelState.AddModelError("ProfilePicture", "Poster Can't be more than 1 MB.");
+
+                //}
+
+                // convert picture to arr
+                var dataStream = new MemoryStream();
+                using (dataStream)
+                {
+                    await file.CopyToAsync(dataStream);
+                    user.ProfilePicture = dataStream.ToArray();
+                }
+                await _userManager.UpdateAsync(user);
             }
 
             await _signInManager.RefreshSignInAsync(user);
