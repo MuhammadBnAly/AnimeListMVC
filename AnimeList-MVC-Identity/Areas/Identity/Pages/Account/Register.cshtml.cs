@@ -102,6 +102,7 @@ namespace AnimeList_MVC_Identity.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
 
                     // If any one register => (Role = User)
+
                     await _userManager.AddToRoleAsync(user, "User");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
