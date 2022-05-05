@@ -81,7 +81,8 @@ namespace AnimeList_MVC_Identity.Areas.Identity.Pages.Account
 
             // new UserName
             var username = new EmailAddressAttribute().IsValid(Input.Email)
-                ? _userManager.FindByEmailAsync(Input.Email).Result.UserName
+                //? _userManager.FindByEmailAsync(Input.Email).Result.UserName
+                ? new MailAddress(Input.Email).User
                 : Input.Email;
 
             if (ModelState.IsValid)

@@ -142,19 +142,6 @@ namespace AnimeList_MVC_Identity.Areas.Identity.Pages.Account.Manage
             {
                 var file = Request.Form.Files.FirstOrDefault();
 
-                //// check if image is jpg / png
-                //if (! _myConsts.allowedExtensions.Contains(Path.GetExtension(file.FileName).ToLower()))
-                //{
-                //    ModelState.AddModelError("ProfilePicture", "Only .JPG , .PNG images are allowed.");
-
-                //}
-
-                //// check the size of the image : OneMegaByte = 1 MB = 1048576 B
-                //if (file.Length > _myConsts.OneMegaByte)
-                //{
-                //    ModelState.AddModelError("ProfilePicture", "Poster Can't be more than 1 MB.");
-
-                //}
 
                 // convert picture to arr
                 var dataStream = new MemoryStream();
@@ -164,6 +151,28 @@ namespace AnimeList_MVC_Identity.Areas.Identity.Pages.Account.Manage
                     user.ProfilePicture = dataStream.ToArray();
                 }
                 await _userManager.UpdateAsync(user);
+
+
+                // check if image is jpg / png
+                var allowedExtensions = new List<string> { ".jpg", ".png" };
+                if (!allowedExtensions.Contains(Path.GetExtension(file.FileName).ToLower()))
+                {
+                    //ModelState.AddModelError("ProfilePicture", "Only .JPG , .PNG images are allowed.");
+                    StatusMessage = "Only .JPG , .PNG images are allowed.";
+                    return RedirectToPage();
+                }
+
+                // check the size of the image : OneMegaByte = 1 MB = 1048576 B
+                var OneMegaByte = 1048576;
+                if (file.Length > OneMegaByte)
+                {
+                    //var errorMsg = "<div class='alert alert-danger' role='alert'> Profile Picture Can't be more than 1 MB. </ div > ";
+
+                    //ModelState.AddModelError("ProfilePicture", "Profile Picture Can't be more than 1 MB.");
+                    StatusMessage = "Profile Picture Can't be more than 1 MB.";
+                    return RedirectToPage();
+                }
+
             }
 
             await _signInManager.RefreshSignInAsync(user);

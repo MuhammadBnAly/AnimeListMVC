@@ -1,0 +1,15 @@
+/*---------------------------------------------------------------------------------------------------------*/
+/* Customization of Other Css Styles for the Project */
+
+/* Profile Picture */
+.profile-picture-class {
+    height: 300px;
+    width: 300px;
+    object-fit: cover;
+}
+
+.avatarPP {
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
+}
