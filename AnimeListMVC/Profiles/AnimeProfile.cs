@@ -8,8 +8,8 @@ namespace AnimeListMVC.Profiles
     {
         public AnimeProfile()
         {
-            CreateMap<Anime, AnimeFormViewModel>();
-            CreateMap<AnimeFormViewModel, Anime>();
+            //CreateMap<Anime, AnimeFormViewModel>();
+            //CreateMap<AnimeFormViewModel, Anime>();
         }
     }
 }

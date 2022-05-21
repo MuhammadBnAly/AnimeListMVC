@@ -1,0 +1,36 @@
+﻿@model IEnumerable<IdentityRole>
+
+
+@{
+    ViewBag.Title = "Roles";
+}
+
+<h3>Roles</h3>
+<hr />
+<!--Adding Role-->
+<div>
+    <partial name="_RoleForm" model="new RoleFormViewModel()" />
+</div>
+
+<div class="">
+    <table class="table table-striped mt-4">
+        <thead class="bg-info text-white">
+            <th>Id</th>
+            <th>Role Name</th>
+        </thead>
+        <tbody>
+            @foreach(var role in Model)
+            {
+                <tr>
+                    <td>@role.Id</td>
+                    <td>@role.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@* validate in cline-side not on server-side *@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

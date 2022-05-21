@@ -32,7 +32,7 @@ namespace AnimeListMVC
             services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddAutoMapper(n => n.AddProfile(new AnimeProfile()));
+            //services.AddAutoMapper(n => n.AddProfile(new AnimeProfile()));
 
             services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
             {

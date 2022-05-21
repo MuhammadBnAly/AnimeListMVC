@@ -9,24 +9,26 @@ using System.Collections.Generic;
 using System.IO;
 using NToastNotify;
 using AnimeListMVC.ViewModels;
-using AutoMapper;
+//using AutoMapper;
 
 namespace AnimeListMVC.Controllers
 {
     public class AnimeController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
+        //private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         
 
         private myConsts constObj = new myConsts();
 
 
-        public AnimeController(AppDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public AnimeController(AppDbContext context,
+            //IMapper mapper,
+            IToastNotification toastNotification)
         {
             this._context = context;
-            this._mapper = mapper;
+            //this._mapper = mapper;
             this._toastNotification = toastNotification;
         }
 
@@ -95,7 +97,6 @@ namespace AnimeListMVC.Controllers
 
             // check if image jpg/ png or not
             // show error msg to user
-
             var poster = files.FirstOrDefault();
 
             // check if image is jpg / png
@@ -121,27 +122,27 @@ namespace AnimeListMVC.Controllers
             using var dataStream = new MemoryStream();
             await poster.CopyToAsync(dataStream);
 
-            // Mapping ( AnimeFormViewModel ==> Anime )
-            var mapper = _mapper.Map<Anime>(model);
-            mapper.Poster = dataStream.ToArray();
+            //// Mapping ( AnimeFormViewModel ==> Anime )
+            //var mapper = _mapper.Map<Anime>(model);
+            //mapper.Poster = dataStream.ToArray();
 
-            //var anime = new Anime
-            //{
-            //    Title = model.Title,
-            //    CategoryId = model.CategoryId,
-            //    Year = model.Year,
-            //    Rate = model.Rate,
-            //    StoreLine = model.StoreLine,
-            //    Poster = dataStream.ToArray()
-            //};
+            var anime = new Anime
+            {
+                Title = model.Title,
+                CategoryId = model.CategoryId,
+                Year = model.Year,
+                Rate = model.Rate,
+                StoreLine = model.StoreLine,
+                Poster = dataStream.ToArray()
+            };
 
-            // save data to database
-            //await _context.Animes.AddAsync(anime);
-            await _context.Animes.AddAsync(mapper);
+            //// save data to database
+            await _context.Animes.AddAsync(anime);
+            //await _context.Animes.AddAsync(mapper);
             await _context.SaveChangesAsync();
 
             // notification
-            _toastNotification.AddSuccessToastMessage(mapper.Title + " Created Successfully");
+            _toastNotification.AddSuccessToastMessage(anime.Title + " Created Successfully");
 
             //return RedirectToAction("Index");
             return RedirectToAction(nameof(Index));
@@ -158,21 +159,21 @@ namespace AnimeListMVC.Controllers
             if (anime == null)
                 return NotFound();
 
-            var viewModel = new AnimeFormViewModel();
-            viewModel.Categories = await _context.Categories.OrderBy(n => n.Name).ToListAsync();
-            _mapper.Map<Anime>(viewModel);
+            //var viewModel = new AnimeFormViewModel();
+            //viewModel.Categories = await _context.Categories.OrderBy(n => n.Name).ToListAsync();
+            //_mapper.Map<Anime>(viewModel);
 
-            //var viewModel = new AnimeFormViewModel
-            //{
-            //    Id = anime.Id,
-            //    Title = anime.Title,
-            //    Year = anime.Year,
-            //    Rate = anime.Rate,
-            //    CategoryId = anime.CategoryId,
-            //    StoreLine = anime.StoreLine,
-            //    Poster = anime.Poster,
-            //    Categories = await _context.Categories.OrderBy(n => n.Name).ToListAsync()
-            //};
+            var viewModel = new AnimeFormViewModel
+            {
+                Id = anime.Id,
+                Title = anime.Title,
+                Year = anime.Year,
+                Rate = anime.Rate,
+                CategoryId = anime.CategoryId,
+                StoreLine = anime.StoreLine,
+                Poster = anime.Poster,
+                Categories = await _context.Categories.OrderBy(n => n.Name).ToListAsync()
+            };
             return View("AnimeForm", viewModel);
         }
         [HttpPost]
@@ -187,14 +188,14 @@ namespace AnimeListMVC.Controllers
             }
 
             // if Id is correct 
-            //var anime = await _context.Animes.SingleOrDefaultAsync(n => n.Id == model.Id);
-            var returned = await _context.Animes.SingleOrDefaultAsync(n => n.Id == model.Id);
+            var anime = await _context.Animes.SingleOrDefaultAsync(n => n.Id == model.Id);
+            //var returned = await _context.Animes.SingleOrDefaultAsync(n => n.Id == model.Id);
 
-            if (returned == null)
+            if (anime == null)
                 return NotFound();
 
             //mapping
-            _mapper.Map(model, returned);
+            //_mapper.Map(model, returned);
 
             //var mapper = _mapper.Map<Anime>(returned);
 
@@ -228,19 +229,19 @@ namespace AnimeListMVC.Controllers
                     ModelState.AddModelError("Poster", "Poster Can't be more than 1 MB.");
                     return View("AnimeForm", model);
                 }
-                //anime.Poster = model.Poster;
+                anime.Poster = model.Poster;
                 //mapper.Poster = model.Poster;
-                var mapper = _mapper.Map<Anime>(model);
+                //var mapper = _mapper.Map<Anime>(model);
 
             }
             //var mapper2 = _mapper.Map<Anime>(model);
 
             // mapping
-            //anime.Title = model.Title;
-            //anime.Year = model.Year;
-            //anime.Rate = model.Rate;
-            //anime.CategoryId = model.CategoryId;
-            //anime.StoreLine = model.StoreLine;
+            anime.Title = model.Title;
+            anime.Year = model.Year;
+            anime.Rate = model.Rate;
+            anime.CategoryId = model.CategoryId;
+            anime.StoreLine = model.StoreLine;
 
             await _context.SaveChangesAsync();
 
